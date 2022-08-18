@@ -8,7 +8,8 @@
 
 import Foundation
 
-let BaseUrl = "http://localhost:8000"
+// let BaseUrl = "http://localhost:8000"
+const BaseUrl = "https://f.cybersec24.ir/instagram/engine/instagrapi/"
 
 func getVersion() {
     let url = URL(string: "\(BaseUrl)/version")!
