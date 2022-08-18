@@ -1,0 +1,62 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    cattle.io/creator: h.hashemi
+    workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
+  name: instagrapi-engine
+  namespace: instagramm
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
+    spec:
+      containers:
+        - image: reg.fn/instagramm/instagrapi-engine:<version>
+          imagePullPolicy: Always
+          name: instagrapi-engine
+          ports:
+            - containerPort: 446
+            - containerPort: 8081
+              name: http
+              protocol: TCP
+          env:
+            - name: "SUBSTRUCTURE"
+              value: "internal"
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {}
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+          #volumeMounts:
+          #- mountPath: /usr/share/nginx/html/upload
+          # name: upload
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: hashemi
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      #volumes:
+      #- name: upload
+      # persistentVolumeClaim:
+      #  claimName: upload

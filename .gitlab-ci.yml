@@ -1,0 +1,23 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  CONTAINER_IMAGE: reg.fn/instagramm/instagrapi-engine:${CI_COMMIT_SHORT_SHA}
+
+build:
+  stage: build
+  script:
+    - docker login -u h.hashemi -p '123456Qaz' reg.fn
+    - docker build -t ${CONTAINER_IMAGE} .
+    - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE}
+    - docker tag ${CONTAINER_IMAGE} reg.fn/h.hashemi/instagrapi-engine:latest
+    - docker push ${CONTAINER_IMAGE}
+
+deploy:
+  stage: deploy
+  script:
+    - sed -i "s/<version>/${CI_COMMIT_SHORT_SHA}/g" deployment.yml
+    - scp deployment.yml x@host:/tmp
+    - ssh x@host 'kubectl apply -f /tmp/deployment.yml'
+    - ssh x@host 'rm -rf /tmp/deployment.yml'
