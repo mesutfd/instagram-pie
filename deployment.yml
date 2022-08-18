@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - image: reg.fn/ha-instagram/instagrapi-engine:<version>
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: instagrapi-engine
           ports:
             - containerPort: 446
