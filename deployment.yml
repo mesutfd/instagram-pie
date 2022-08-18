@@ -5,7 +5,7 @@ metadata:
     cattle.io/creator: h.hashemi
     workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
   name: instagrapi-engine
-  namespace: instagramm
+  namespace: ha-instagram
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
