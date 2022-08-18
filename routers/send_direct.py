@@ -18,9 +18,10 @@ from instagrapi.types import (
 
 router = APIRouter(
     prefix='/direct',
-    tags = ["direct"],
-    responses = {404 : {'description':'Not Found'}}
+    tags=["direct"],
+    responses={404: {'description': 'Not Found'}}
 )
+
 
 @router.post('/send_by_username')
 def send_direct_message_by_username(
@@ -28,12 +29,13 @@ def send_direct_message_by_username(
         target_username: str = Form(...),
         message_body: str = Form(...),
         clients: ClientStorage = Depends(get_clients),
-        ):
+):
     cl = clients.get(sessionid)
     taken_username = cl.user_id_from_username(target_username)
     taken_user_id = int(taken_username)
     result = cl.direct_send(message_body, [taken_user_id, ])
     return result
+
 
 @router.post('/send_by_id')
 def send_direct_message_by_username(
@@ -41,25 +43,26 @@ def send_direct_message_by_username(
         target_userid: int = Form(...),
         message_body: str = Form(...),
         clients: ClientStorage = Depends(get_clients),
-        ):
+):
     cl = clients.get(sessionid)
     result = cl.direct_send(message_body, [target_userid, ])
     return result
 
-@router.post('/send_to_username_list')
-def send_direct_message_by_username_list(
-        sessionid: str = Form(...),
-        target_usernames_list: list[int] = Form(...),
-        message_body: str = Form(...),
-        clients: ClientStorage = Depends(get_clients),
-        ):
-    cl = clients.get(sessionid)
-    taken_users_id = []
-    for i in target_usernames_list:
-        taken_user_list_id = cl.user_id_from_username(i)
-        taken_users_id.append(int(taken_user_list_id))
-    result = cl.direct_send(message_body, taken_users_id)
-    return result
+# @router.post('/send_to_username_list')
+# def send_direct_message_by_username_list(
+#         sessionid: str = Form(...),
+#         target_usernames_list: list[int] = Form(...),
+#         message_body: str = Form(...),
+#         clients: ClientStorage = Depends(get_clients),
+#         ):
+#     cl = clients.get(sessionid)
+#     taken_users_id = []
+#     for i in target_usernames_list:
+#         taken_user_list_id = cl.user_id_from_username(i)
+#         taken_users_id.append(int(taken_user_list_id))
+#     result = cl.direct_send(message_body, taken_users_id)
+#     return result
+
 
 @router.post('/send_to_id_list')
 def send_direct_message_by_username_list(
@@ -67,7 +70,7 @@ def send_direct_message_by_username_list(
         target_ids_list: list[int] = Form(...),
         message_body: str = Form(...),
         clients: ClientStorage = Depends(get_clients),
-        ):
+):
     cl = clients.get(sessionid)
     taken_users_id = []
     for i in target_ids_list:
