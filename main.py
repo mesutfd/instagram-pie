@@ -23,14 +23,14 @@ app.include_router(insights.router)
 app.include_router(send_direct.router)
 
 
-@app.get("/", tags=["system"], summary="Redirect to /docs")
+@app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Redirect to /docs")
 async def root():
     """Redirect to /docs
     """
-    return RedirectResponse(url="/docs")
+    return RedirectResponse(url="/instagram/engine/instagrapi/docs")
 
 
-@app.get("/version", tags=["system"], summary="Get dependency versions")
+@app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
 async def version():
     """Get dependency versions
     """
@@ -58,12 +58,13 @@ def custom_openapi():
     #     if body_field:
     #         body_field.type_.__name__ = 'name'
     openapi_schema = get_openapi(
-        title="Naji",
+        title="instagrapi",
         version="1.0.0",
         description="RESTful API Service for Instagram OSINT",
         routes=app.routes,
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema
+
 
 app.openapi = custom_openapi
