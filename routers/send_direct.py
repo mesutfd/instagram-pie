@@ -64,16 +64,16 @@ def send_direct_message_by_username(
 #     return result
 
 
-@router.post('/send_to_id_list')
-def send_direct_message_by_username_list(
-        sessionid: str = Form(...),
-        target_ids_list: list[int] = Form(...),
-        message_body: str = Form(...),
-        clients: ClientStorage = Depends(get_clients),
-):
-    cl = clients.get(sessionid)
-    taken_users_id = []
-    for i in target_ids_list:
-        taken_users_id.append(i)
-    result = cl.direct_send(message_body, taken_users_id)
-    return result
+# @router.post('/send_to_id_list')
+# def send_direct_message_by_username_list(
+#         sessionid: str = Form(...),
+#         target_ids_list: list[int] = Form(...),
+#         message_body: str = Form(...),
+#         clients: ClientStorage = Depends(get_clients),
+# ):
+#     cl = clients.get(sessionid)
+#     taken_users_id = []
+#     for i in target_ids_list:
+#         taken_users_id.append(i)
+#     result = cl.direct_send(message_body, taken_users_id)
+#     return result
