@@ -3,7 +3,7 @@ stages:
   - deploy
 
 variables:
-  CONTAINER_IMAGE: reg.fn/instagramm/instagrapi-engine:${CI_COMMIT_SHORT_SHA}
+  CONTAINER_IMAGE: reg.fn/ha-instagram/instagrapi-engine:${CI_COMMIT_SHORT_SHA}
 
 build:
   stage: build
@@ -11,7 +11,7 @@ build:
     - docker login -u h.hashemi -p '123456Qaz' reg.fn
     - docker build -t ${CONTAINER_IMAGE} .
     - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE}
-    - docker tag ${CONTAINER_IMAGE} reg.fn/h.hashemi/instagrapi-engine:latest
+    - docker tag ${CONTAINER_IMAGE} reg.fn/ha-instagram/instagrapi-engine:latest
     - docker push ${CONTAINER_IMAGE}
 
 deploy:

@@ -24,7 +24,7 @@ spec:
         workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
     spec:
       containers:
-        - image: reg.fn/instagramm/instagrapi-engine:<version>
+        - image: reg.fn/ha-instagram/instagrapi-engine:<version>
           imagePullPolicy: Always
           name: instagrapi-engine
           ports:
