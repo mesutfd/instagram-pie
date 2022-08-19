@@ -23,9 +23,9 @@ app.include_router(insights.router)
 app.include_router(send_direct.router)
 
 
-@app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Redirect to /docs")
+@app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Redirect to /instagram/engine/instagrapi/docs")
 async def root():
-    """Redirect to /docs
+    """Redirect to /instagram/engine/instagrapi/docs
     """
     return RedirectResponse(url="/instagram/engine/instagrapi/docs")
 
