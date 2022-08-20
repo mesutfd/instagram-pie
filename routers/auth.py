@@ -4,11 +4,12 @@ from fastapi import APIRouter, Depends, Form
 from dependencies import ClientStorage, get_clients
 
 router = APIRouter(
+    prefix="/auth",
     tags=["auth"],
     responses={404: {"description": "Not found"}}
 )
 
-@router.post("/instagram/engine/instagrapi/auth/login")
+@router.post("/login")
 async def auth_login(username: str = Form(...),
                      password: str = Form(...),
                      verification_code: Optional[str] = Form(""),
