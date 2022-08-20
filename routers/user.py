@@ -9,7 +9,7 @@ from dependencies import ClientStorage, get_clients
 
 
 router = APIRouter(
-    prefix="/user",
+    prefix="/instagram/engine/instagrapi/user",
     tags=["user"],
     responses={404: {"description": "Not found"}},
 )
