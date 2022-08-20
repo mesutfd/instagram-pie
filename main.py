@@ -11,7 +11,7 @@ from routers import (
     insights, send_direct
 )
 
-app = FastAPI(prefix = '/instagram/engine/instagrapi',openapi_url = '/instagram/engine/instagrapi/openapi.json')
+app = FastAPI(prefix = '/instagram/engine/instagrapi')
 app.include_router(auth.router)
 app.include_router(media.router)
 app.include_router(video.router)
