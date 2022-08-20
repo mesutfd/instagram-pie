@@ -1,6 +1,6 @@
 import pkg_resources
 
-from fastapi import FastAPI, applications
+from fastapi import FastAPI, applications, Depends
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.responses import RedirectResponse, JSONResponse
@@ -9,20 +9,6 @@ from routers import (
     igtv, clip, album, story,
     insights, send_direct
 )
-
-def swagger_monkey_patch(*args, **kwargs):
-    """
-    Wrap the function which is generating the HTML for the /docs endpoint and 
-    overwrite the default values for the swagger js and css.
-    """
-    return get_swagger_ui_html(
-        *args, **kwargs,
-        swagger_js_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.29/swagger-ui-bundle.js",
-        swagger_css_url="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.29/swagger-ui.css")
-
-
-# Actual monkey patch
-applications.get_swagger_ui_html = swagger_monkey_patch
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -42,7 +28,7 @@ app.include_router(send_direct.router)
 async def root():
     """Redirect to /instagram/engine/instagrapi/docs
     """
-    return RedirectResponse(url="/instagram/engine/instagrapi/docs")
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="Swagger")
 
 
 @app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
@@ -55,6 +41,7 @@ async def version():
         if item:
             versions[name] = item[0].version
     return versions
+
 
 
 @app.exception_handler(Exception)
