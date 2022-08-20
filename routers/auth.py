@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from dependencies import ClientStorage, get_clients
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/instagram/engine/instagrapi/auth",
     tags=["auth"],
     responses={404: {"description": "Not found"}}
 )
@@ -19,6 +19,7 @@ async def auth_login(username: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
+    return 'test'
     cl = clients.client()
     if proxy != "":
         cl.set_proxy(proxy)
