@@ -1,6 +1,6 @@
 import pkg_resources
 
-from fastapi import FastAPI, applications, Depends
+from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.responses import RedirectResponse, JSONResponse
@@ -25,10 +25,11 @@ app.include_router(send_direct.router)
 
 
 @app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Redirect to /instagram/engine/instagrapi/docs")
-async def root():
+async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
-    return get_swagger_ui_html(openapi_url="/openapi.json", title="Swagger")
+    print(request.scope.get("root_path"))
+    return get_swagger_ui_html(openapi_url=request.scope.get("root_path")+"/openapi.json", title="Swagger")
 
 
 @app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
