@@ -17,7 +17,7 @@ from instagrapi.types import (
 )
 
 router = APIRouter(
-    prefix='/instagram/engine/instagrapi/direct',
+    prefix='/direct',
     tags=["direct"],
     responses={404: {'description': 'Not Found'}}
 )
