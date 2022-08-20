@@ -10,7 +10,7 @@ from helpers import album_upload_post
 
 
 router = APIRouter(
-    prefix="/album",
+    prefix="/instagram/engine/instagrapi/album",
     tags=["album"],
     responses={404: {"description": "Not found"}},
 )
