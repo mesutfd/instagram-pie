@@ -28,8 +28,10 @@ app.include_router(send_direct.router)
 async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
-    print(request.scope.get("root_path"))
-    return get_swagger_ui_html(openapi_url=request.scope.get("root_path")+"/openapi.json", title="Swagger")
+    return get_swagger_ui_html(
+        openapi_url='/instagram/engine/instagrapi/openapi.json',
+        title="API ",
+    )
 
 
 @app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
