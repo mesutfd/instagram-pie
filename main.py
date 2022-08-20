@@ -1,3 +1,4 @@
+from sys import prefix
 import pkg_resources
 
 from fastapi import FastAPI, Request
@@ -10,7 +11,7 @@ from routers import (
     insights, send_direct
 )
 
-app = FastAPI()
+app = FastAPI(prefix = '/instagram/engine/instagrapi',openapi_url = '/instagram/engine/instagrapi/openapi.json')
 app.include_router(auth.router)
 app.include_router(media.router)
 app.include_router(video.router)
@@ -24,17 +25,17 @@ app.include_router(insights.router)
 app.include_router(send_direct.router)
 
 
-@app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Redirect to /instagram/engine/instagrapi/docs")
+@app.get("/", tags=["system"], summary="Redirect to /instagram/engine/instagrapi/docs")
 async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
     return get_swagger_ui_html(
-        openapi_url='/instagram/engine/instagrapi/openapi.json',
+        openapi_url='/openapi.json',
         title="API ",
     )
 
 
-@app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
+@app.get("/version", tags=["system"], summary="Get dependency versions")
 async def version():
     """Get dependency versions
     """
@@ -63,7 +64,7 @@ def custom_openapi():
     #     if body_field:
     #         body_field.type_.__name__ = 'name'
     openapi_schema = get_openapi(
-        title="instagrapi",
+        title="NAJI Instagrapi API",
         version="1.0.0",
         description="RESTful API Service for Instagram OSINT",
         routes=app.routes,
