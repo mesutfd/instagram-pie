@@ -30,7 +30,7 @@ async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
     return get_swagger_ui_html(
-        openapi_url='/openapi.json',
+        openapi_url='/instagram/engine/instagrapi/openapi.json',
         title="API ",
     )
 
