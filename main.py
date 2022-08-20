@@ -31,7 +31,7 @@ async def root(request: Request):
     """
     return get_swagger_ui_html(
         openapi_url='/instagram/engine/instagrapi/openapi.json',
-        title="API ",
+        title="API Swagger",
     )
 
 

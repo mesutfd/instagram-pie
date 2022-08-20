@@ -10,7 +10,7 @@ from dependencies import ClientStorage, get_clients
 from helpers import igtv_upload_post
 
 router = APIRouter(
-    prefix="/instagram/engine/instagrapi/igtv",
+    prefix="/igtv",
     tags=["igtv"],
     responses={404: {"description": "Not found"}},
 )
