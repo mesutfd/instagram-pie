@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from dependencies import ClientStorage, get_clients
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/instagram/engine/instagrapi/auth",
     tags=["auth"],
     responses={404: {"description": "Not found"}}
 )

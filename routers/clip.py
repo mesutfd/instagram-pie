@@ -11,7 +11,7 @@ from helpers import clip_upload_post
 
 
 router = APIRouter(
-    prefix="/clip",
+    prefix="/instagram/engine/instagrapi/clip",
     tags=["clip"],
     responses={404: {"description": "Not found"}},
 )
