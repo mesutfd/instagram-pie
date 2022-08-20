@@ -19,6 +19,7 @@ async def auth_login(username: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
+    return 'test'
     cl = clients.client()
     if proxy != "":
         cl.set_proxy(proxy)
