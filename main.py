@@ -78,31 +78,31 @@ async def version():
 
 @app.post("/auth/login/", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_login(username: str = Form(...), password: str = Form(...), verification_code: Optional[str] = Form(""), proxy: Optional[str] = Form(""), locale: Optional[str] = Form(""), timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
-    await auth.auth_login(username, password, verification_code, proxy, locale, timezone, clients)
+    return await auth.auth_login(username, password, verification_code, proxy, locale, timezone, clients)
 
 @app.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_relogin(sessionid: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
     """Relogin by username and password (with clean cookies)
     """
-    await auth.auth_relogin(sessionid, clients)
+    return await auth.auth_relogin(sessionid, clients)
 
 @app.get("/auth/settings/get", tags=["auth"], responses={404: {"description": "Not found"}})
 async def settings_get(sessionid: str, clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get client's settings
     """
-    await auth.settings_get(sessionid, clients)
+    return await auth.settings_get(sessionid, clients)
 
 @app.post("/auth/settings/set", tags=["auth"], responses={404: {"description": "Not found"}})
 async def settings_set(settings: str = Form(...), sessionid: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Set client's settings
     """
-    await auth.settings_set(settings, sessionid, clients)
+    return await auth.settings_set(settings, sessionid, clients)
 
 @app.get("/auth/timeline_feed", tags=["auth"], responses={404: {"description": "Not found"}})
 async def timeline_feed(sessionid: str, clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get your timeline feed
     """
-    await auth.timeline_feed(sessionid, clients)
+    return await auth.timeline_feed(sessionid, clients)
 
 #MEDIA
 
@@ -110,31 +110,31 @@ async def timeline_feed(sessionid: str, clients: ClientStorage = Depends(get_cli
 async def media_pk_from_code(code: str) -> str:
     """Get media pk from code
     """
-    await media.media_pk_from_code(code)
+    return await media.media_pk_from_code(code)
 
 @app.get("/media/pk_from_url", tags=["media"], responses={404: {"description": "Not found"}})
 async def media_pk_from_url(url: str) -> str:
     """Get Media PK from URL
     """
-    await media.media_pk_from_url(url)
+    return await media.media_pk_from_url(url)
 
 @app.post("/media/info", response_model=Media, tags=["media"], responses={404: {"description": "Not found"}})
 async def media_info(sessionid: str = Form(...), pk: int = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> Media:
     """Get media info by pk
     """
-    await media.media_info(sessionid, pk, use_cache, clients)
+    return await media.media_info(sessionid, pk, use_cache, clients)
 
 @app.post("/media/user_medias", response_model=List[Media], tags=["media"], responses={404: {"description": "Not found"}})
 async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
-    await media.user_medias(sessionid, user_id, amount, clients)
+    return await media.user_medias(sessionid, user_id, amount, clients)
 
 @app.post("/media/likers", response_model=List[UserShort], tags=["media"], responses={404: {"description": "Not found"}})
 async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     """Get user's likers
     """
-    await media.media_likers(sessionid, media_id, clients)
+    return await media.media_likers(sessionid, media_id, clients)
 
 #USER
 
@@ -142,37 +142,37 @@ async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), cl
 async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers
     """
-    await user.user_followers(sessionid, user_id, use_cache, amount, clients)
+    return await user.user_followers(sessionid, user_id, use_cache, amount, clients)
 
 @app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers information
     """
-    await user.user_following(sessionid, user_id, use_cache, amount, clients)
+    return await user.user_following(sessionid, user_id, use_cache, amount, clients)
 
 @app.post("/user/info", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from user id
     """
-    await user.user_info(sessionid, user_id, use_cache, clients)
+    return await user.user_info(sessionid, user_id, use_cache, clients)
 
 @app.post("/user/info_by_username", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info_by_username(sessionid: str = Form(...), username: str = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from username
     """
-    await user.user_info_by_username(sessionid, username, use_cache, clients)
+    return await user.user_info_by_username(sessionid, username, use_cache, clients)
 
 @app.post("/user/id_from_username", response_model=int, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_id_from_username(sessionid: str = Form(...), username: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> int:
     """Get user id from username
     """
-    await user.user_id_from_username(sessionid, username, clients)
+    return await user.user_id_from_username(sessionid, username, clients)
 
 @app.post("/user/username_from_id", response_model=str, tags=["user"], responses={404: {"description": "Not found"}})
 async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
     """Get username from user id
     """
-    await user.username_from_user_id(sessionid, user_id, clients)
+    return await user.username_from_user_id(sessionid, user_id, clients)
 
 #STORY
 
@@ -180,45 +180,45 @@ async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(
 async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(None), clients: ClientStorage = Depends(get_clients)) -> List[Story]:
     """Get a user's stories
     """
-    await story.story_user_stories(sessionid, user_id, amount, clients)
+    return await story.story_user_stories(sessionid, user_id, amount, clients)
 
 @app.post("/story/info", response_model=Story, tags=["story"], responses={404: {"description": "Not found"}})
 async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> Story:
     """Get Story by pk or id
     """
-    await story.story_info(sessionid, story_pk, use_cache, clients)
+    return await story.story_info(sessionid, story_pk, use_cache, clients)
 
 #DIRECT
 
 @app.post('/direct/send_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_message_by_username(sessionid: str = Form(...), target_username: str = Form(...), message_body: str = Form(...), clients: ClientStorage = Depends(get_clients)):
-    await send_direct.send_direct_message_by_username(sessionid, target_username, message_body, clients)
+    return await send_direct.send_direct_message_by_username(sessionid, target_username, message_body, clients)
 
 @app.post('/direct/send_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: int = Form(...), message_body: str = Form(...), clients: ClientStorage = Depends(get_clients),):
-    await send_direct.send_direct_message_by_id(sessionid, target_userid, message_body, clients)
+    return await send_direct.send_direct_message_by_id(sessionid, target_userid, message_body, clients)
 
 @app.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_photo_by_id(sessionid: str = Form(...), path: Path = Form(...), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
-    await send_direct.send_direct_photo_by_id(sessionid, path, user_id, clients)
+    return await send_direct.send_direct_photo_by_id(sessionid, path, user_id, clients)
 
 @app.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_photo_by_username(sessionid: str = Form(...), path: Path = Form(...), username: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
-    await send_direct.send_direct_photo_by_username(sessionid, path, username, clients)
+    return await send_direct.send_direct_photo_by_username(sessionid, path, username, clients)
 
 #HASHTAG
 
 @app.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
-    await hashtag.hashtag_top(sessionid, name, amount, clients)
+    return await hashtag.hashtag_top(sessionid, name, amount, clients)
 
 @app.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
-    await hashtag.hashtag_recent(sessionid, name, amount, clients)
+    return await hashtag.hashtag_recent(sessionid, name, amount, clients)
 
 @app.post('/hashtag/get_hashtag_info', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), clients: ClientStorage = Depends(get_clients)):
-    await hashtag.hashtag_info(sessionid, name, clients)
+    return await hashtag.hashtag_info(sessionid, name, clients)
 
 
 
