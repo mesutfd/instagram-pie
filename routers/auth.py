@@ -8,7 +8,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}}
 )
 
-@router.post("/instagram/engine/instagrapi/auth/login")
+@router.post("/instagram/engine/instagrapi/auth/login/")
 async def auth_login(username: str = Form(...),
                      password: str = Form(...),
                      verification_code: Optional[str] = Form(""),
