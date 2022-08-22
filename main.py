@@ -8,7 +8,7 @@ from starlette.responses import RedirectResponse, JSONResponse
 from routers import (
     auth, media, video, photo, user,
     igtv, clip, album, story,
-    insights, send_direct
+    insights, send_direct, hashtag
 )
 
 app = FastAPI(prefix = '/instagram/engine/instagrapi')
@@ -24,6 +24,8 @@ app.include_router(album.router)
 app.include_router(story.router)
 app.include_router(insights.router)
 app.include_router(send_direct.router)
+app.include_router(hashtag.router)
+
 
 
 @app.get("/", tags=["system"], summary="Redirect to /instagram/engine/instagrapi/docs")
