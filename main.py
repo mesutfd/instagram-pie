@@ -49,7 +49,7 @@ async def version():
 
 @app.post("/auth/login/", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_login(username: str = Form(...), password: str = Form(...), verification_code: Optional[str] = Form(""), proxy: Optional[str] = Form(""), locale: Optional[str] = Form(""), timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
-    return dict(await auth.auth_login(username, password, verification_code, proxy, locale, timezone, clients))
+    return json.dumps(await auth.auth_login(username, password, verification_code, proxy, locale, timezone, clients))
 
 @app.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_relogin(sessionid: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
