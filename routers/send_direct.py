@@ -1,34 +1,14 @@
-from typing import List, Optional
-from pathlib import Path
-import requests
-from instagrapi import Client
-from .auth import auth_login, auth_relogin, settings_get
-import json
 from dependencies import get_clients
 from storages import ClientStorage
 
-from pydantic import AnyHttpUrl
-from fastapi import APIRouter, Depends, File, UploadFile, Form
-from fastapi.responses import FileResponse
-from instagrapi.types import (
-    Story, StoryHashtag, StoryLink,
-    StoryLocation, StoryMention, StorySticker,
-    Media, Location, Usertag
-)
+from pathlib import Path
 
-router = APIRouter(
-    prefix='/direct',
-    tags=["direct"],
-    responses={404: {'description': 'Not Found'}}
-)
-
-
-@router.post('/send_by_username')
-def send_direct_message_by_username(
-        sessionid: str = Form(...),
-        target_username: str = Form(...),
-        message_body: str = Form(...),
-        clients: ClientStorage = Depends(get_clients),
+# @router.post('/send_by_username')
+async def send_direct_message_by_username(
+        sessionid: str,
+        target_username: str,
+        message_body: str,
+        clients: ClientStorage
 ):
     cl = clients.get(sessionid)
     taken_username = cl.user_id_from_username(target_username)
@@ -37,16 +17,31 @@ def send_direct_message_by_username(
     return result
 
 
-@router.post('/send_by_id')
-def send_direct_message_by_username(
-        sessionid: str = Form(...),
-        target_userid: int = Form(...),
-        message_body: str = Form(...),
-        clients: ClientStorage = Depends(get_clients),
+# @router.post('/send_by_id')
+async def send_direct_message_by_id(
+        sessionid: str,
+        target_userid: int,
+        message_body: str,
+        clients: ClientStorage
 ):
     cl = clients.get(sessionid)
     result = cl.direct_send(message_body, [target_userid, ])
     return result
+
+async def send_direct_photo_by_id(sessionid: str, path: Path, user_id: int, clients: ClientStorage):
+    cl = clients.get(sessionid)
+    result = cl.direct_send_photo(path, user_id)
+    return result
+
+async def send_direct_photo_by_username(sessionid: str, path: Path, username: str, clients: ClientStorage):
+    cl = clients.get(sessionid)
+    user_id = cl.user_id_from_username(username)
+    result = cl.direct_send_photo(path, user_id)
+    return result
+
+
+
+
 
 # @router.post('/send_to_username_list')
 # def send_direct_message_by_username_list(
