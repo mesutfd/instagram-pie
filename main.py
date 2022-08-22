@@ -32,36 +32,7 @@ async def root(request: Request):
         title="API Swagger",
     )
 
-@app.get("/instagram/engine/instagrapi/", tags=["system"], summary="Show Docs")
-async def root(request: Request):
-    """Redirect to /instagram/engine/instagrapi/docs
-    """
-    return get_swagger_ui_html(
-        openapi_url='./openapi.json',
-        title="API Swagger",
-    )
-
-@app.get("/instagram/engine/instagrapi", tags=["system"], summary="Show Docs")
-async def root(request: Request):
-    """Redirect to /instagram/engine/instagrapi/docs
-    """
-    return get_swagger_ui_html(
-        openapi_url='./openapi.json',
-        title="API Swagger",
-    )
-
 @app.get("/version", tags=["system"], summary="Get dependency versions")
-async def version():
-    """Get dependency versions
-    """
-    versions = {}
-    for name in ('instagrapi', ):
-        item = pkg_resources.require(name)
-        if item:
-            versions[name] = item[0].version
-    return versions
-
-@app.get("/instagram/engine/instagrapi/version", tags=["system"], summary="Get dependency versions")
 async def version():
     """Get dependency versions
     """
