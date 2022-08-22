@@ -13,7 +13,7 @@ from routers import (
 
 app = FastAPI()
 
-app.include_router(auth.router,prefix = '/auth')
+app.include_router(auth.router,prefix = '/instagram/engine/instagrapi/auth')
 app.include_router(media.router,prefix = '/instagram/engine/instagrapi')
 app.include_router(video.router,prefix = '/instagram/engine/instagrapi')
 app.include_router(photo.router,prefix = '/instagram/engine/instagrapi')
