@@ -1,21 +1,15 @@
 import json
 from typing import Optional, Dict
-from fastapi import APIRouter, Depends, Form
-from dependencies import ClientStorage, get_clients
+from dependencies import ClientStorage
 
-router = APIRouter(
-    tags=["auth"],
-    responses={404: {"description": "Not found"}}
-)
 
-@router.post("/instagram/engine/instagrapi/auth/login/")
-async def auth_login(username: str = Form(...),
-                     password: str = Form(...),
-                     verification_code: Optional[str] = Form(""),
-                     proxy: Optional[str] = Form(""),
-                     locale: Optional[str] = Form(""),
-                     timezone: Optional[str] = Form(""),
-                     clients: ClientStorage = Depends(get_clients)) -> str:
+async def auth_login(username: str,
+                     password: str,
+                     verification_code: Optional[str],
+                     proxy: Optional[str],
+                     locale: Optional[str],
+                     timezone: Optional[str],
+                     clients: ClientStorage) -> str:
     """Login by username and password with 2FA
     """
     cl = clients.client()
@@ -39,9 +33,8 @@ async def auth_login(username: str = Form(...),
     return result
 
 
-@router.post("/relogin")
-async def auth_relogin(sessionid: str = Form(...),
-                       clients: ClientStorage = Depends(get_clients)) -> str:
+async def auth_relogin(sessionid: str,
+                       clients: ClientStorage) -> str:
     """Relogin by username and password (with clean cookies)
     """
     cl = clients.get(sessionid)
@@ -49,19 +42,17 @@ async def auth_relogin(sessionid: str = Form(...),
     return result
 
 
-@router.get("/settings/get")
 async def settings_get(sessionid: str,
-                   clients: ClientStorage = Depends(get_clients)) -> Dict:
+                   clients: ClientStorage) -> Dict:
     """Get client's settings
     """
     cl = clients.get(sessionid)
     return cl.get_settings()
 
 
-@router.post("/settings/set")
-async def settings_set(settings: str = Form(...),
-                       sessionid: Optional[str] = Form(""),
-                       clients: ClientStorage = Depends(get_clients)) -> str:
+async def settings_set(settings: str,
+                       sessionid: Optional[str],
+                       clients: ClientStorage) -> str:
     """Set client's settings
     """
     if sessionid != "":
@@ -73,9 +64,8 @@ async def settings_set(settings: str = Form(...),
     clients.set(cl)
     return cl.sessionid
 
-@router.get("/timeline_feed")
 async def timeline_feed(sessionid: str,
-                   clients: ClientStorage = Depends(get_clients)) -> Dict:
+                   clients: ClientStorage) -> Dict:
     """Get your timeline feed
     """
     cl = clients.get(sessionid)

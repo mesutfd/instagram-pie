@@ -9,36 +9,31 @@ from instagrapi.types import Story
 from dependencies import ClientStorage, get_clients
 
 
-router = APIRouter(
-    prefix="/story",
-    tags=["story"],
-    responses={404: {"description": "Not found"}},
-)
 
 
-@router.post("/user_stories", response_model=List[Story])
-async def story_user_stories(sessionid: str = Form(...), 
-                            user_id: str = Form(...), 
-                            amount: Optional[int] = Form(None), 
-                            clients: ClientStorage = Depends(get_clients)) -> List[Story]:
+# @router.post("/user_stories", response_model=List[Story])
+async def story_user_stories(sessionid: str, 
+                            user_id: str, 
+                            amount: Optional[int], 
+                            clients: ClientStorage) -> List[Story]:
     """Get a user's stories
     """
     cl = clients.get(sessionid)
     return cl.user_stories(user_id, amount)
 
 
-@router.post("/info", response_model=Story)
-async def story_info(sessionid: str = Form(...), 
-                     story_pk: int = Form(...), 
-                     use_cache: Optional[bool] = Form(True), 
-                     clients: ClientStorage = Depends(get_clients)) -> Story:
+# @router.post("/info", response_model=Story)
+async def story_info(sessionid: str, 
+                     story_pk: int, 
+                     use_cache: Optional[bool], 
+                     clients: ClientStorage) -> Story:
     """Get Story by pk or id
     """
     cl = clients.get(sessionid)
     return cl.story_info(story_pk, use_cache)
 
 
-@router.post("/delete", response_model=bool)
+# @router.post("/delete", response_model=bool)
 async def story_delete(sessionid: str = Form(...), 
                        story_pk: int = Form(...), 
                        clients: ClientStorage = Depends(get_clients)) -> bool:
@@ -48,7 +43,7 @@ async def story_delete(sessionid: str = Form(...),
     return cl.story_delete(story_pk)
 
 
-@router.post("/seen", response_model=bool)
+# @router.post("/seen", response_model=bool)
 async def story_seen(sessionid: str = Form(...),
                      story_pks: List[int] = Form(...),
                      skipped_story_pks: Optional[List[int]] = Form([]),
@@ -59,14 +54,14 @@ async def story_seen(sessionid: str = Form(...),
     return cl.story_seen(story_pks, skipped_story_pks)
 
 
-@router.get("/pk_from_url")
+# @router.get("/pk_from_url")
 async def story_pk_from_url(url: str) -> int:
     """Get Story (media) PK from URL
     """
     return Client().story_pk_from_url(url)
 
 
-@router.post("/download")
+# @router.post("/download")
 async def story_download(sessionid: str = Form(...),
                          story_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -83,7 +78,7 @@ async def story_download(sessionid: str = Form(...),
         return result
 
 
-@router.post("/download/by_url")
+# @router.post("/download/by_url")
 async def story_download_by_url(sessionid: str = Form(...),
                                 url: str = Form(...),
                                 filename: Optional[str] = Form(""),
