@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Form
 from dependencies import ClientStorage, get_clients
 
 router = APIRouter(
+    prefix="/auth",
     tags=["auth"],
     responses={404: {"description": "Not found"}}
 )
