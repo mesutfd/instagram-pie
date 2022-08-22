@@ -12,7 +12,7 @@ router = APIRouter(
 async def hashtag_top(
         sessionid: str = Form(...),
         name: str = Form(...),
-        amount: int = 9,
+        amount: int = Form(9),
         clients: ClientStorage = Depends(get_clients),
 
 ):
@@ -26,7 +26,7 @@ async def hashtag_top(
 async def hashtag_recent(
         sessionid: str = Form(...),
         name: str = Form(...),
-        amount: int = 9,
+        amount: int = Form(9),
         clients: ClientStorage = Depends(get_clients),
 
 ):
