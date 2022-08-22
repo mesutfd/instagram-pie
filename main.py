@@ -49,7 +49,27 @@ async def version():
 
 @app.post("/auth/login/", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_login(username: str = Form(...), password: str = Form(...), verification_code: Optional[str] = Form(""), proxy: Optional[str] = Form(""), locale: Optional[str] = Form(""), timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
-    return str(await auth.auth_login(username, password, verification_code, proxy, locale, timezone, clients))
+    """Login by username and password with 2FA
+    """
+    cl = clients.client()
+    if proxy != "":
+        cl.set_proxy(proxy)
+
+    if locale != "":
+        cl.set_locale(locale)
+
+    if timezone != "":
+        cl.set_timezone_offset(timezone)
+
+    result = cl.login(
+        username,
+        password,
+        verification_code=verification_code
+    )
+    if result:
+        clients.set(cl)
+        return cl.sessionid
+    return result
 
 @app.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_relogin(sessionid: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
