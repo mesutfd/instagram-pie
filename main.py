@@ -140,6 +140,37 @@ async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), cl
     cl = clients.get(sessionid)
     return cl.media_likers(media_id)
 
+@router.post("/media/tagged_post_by_id")
+async def get_tagged_posts_by_user_id(
+        sessionid: str = Form(...),
+        userid: int = Form(...),
+        amount: int = Form(...),
+        sleep: Optional[int] = Form(2),
+        clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
+
+
+    cl = clients.get(sessionid)
+
+    posts = cl.usertag_medias_gql(userid, amount, sleep)
+
+    return posts
+
+@router.post("/media/tagged_post_by_username")
+async def get_tagged_posts_by_user_name(
+        sessionid: str = Form(...),
+        username: str = Form(...),
+        amount: int = Form(...),
+        sleep: Optional[int] = Form(2),
+        clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
+
+    cl = clients.get(sessionid)
+    
+    user_id = int(cl.user_id_from_username(username))
+    posts = cl.usertag_medias_gql(user_id, amount, sleep)
+
+    return posts
+
+
 #USER
 
 @router.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
