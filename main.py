@@ -4,9 +4,6 @@ from fastapi import FastAPI, Request, APIRouter
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.responses import JSONResponse
-from routers import (
-    media, user, story, send_direct, hashtag
-)
 from typing import List, Optional, Dict
 from pathlib import Path
 import json
@@ -27,7 +24,7 @@ async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
     return get_swagger_ui_html(
-        openapi_url='/openapi.json',
+        openapi_url='/instagram/engine/instagrapi/openapi.json',
         title="API Swagger",
     )
 
@@ -248,15 +245,15 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
     return result
 
 @router.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_photo_by_id(sessionid: str = Form(...), path: Path = Form(...), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
+async def send_direct_photo_by_id(sessionid: str = Form(...), path: str = Form('/instagram/engine/instagrapi/fata.jpg'), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result = cl.direct_send_photo(path, user_id)
     return result
 
 @router.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_photo_by_username(sessionid: str = Form(...), path: Path = Form(...), username: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
+async def send_direct_photo_by_username(sessionid: str = Form(...), path: str = Form('/instagram/engine/instagrapi/fata.jpg'), username: str = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
-    user_id = cl.user_id_from_username(username)
+    user_id = int(cl.user_id_from_username(username))
     result = cl.direct_send_photo(path, user_id)
     return result
 
