@@ -244,18 +244,18 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
     result = cl.direct_send(message_body, [target_userid, ])
     return result
 
-@router.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_photo_by_id(sessionid: str = Form(...), path: str = Form('/instagram/engine/instagrapi/fata.jpg'), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
-    cl = clients.get(sessionid)
-    result = cl.direct_send_photo(path, user_id)
-    return result
+# @router.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
+# async def send_direct_photo_by_id(sessionid: str = Form(...), path: str = Form('/fata.jpg'), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
+#     cl = clients.get(sessionid)
+#     result = cl.direct_send_photo(path, user_id)
+#     return result
 
-@router.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_photo_by_username(sessionid: str = Form(...), path: str = Form('/instagram/engine/instagrapi/fata.jpg'), username: str = Form(...), clients: ClientStorage = Depends(get_clients)):
-    cl = clients.get(sessionid)
-    user_id = int(cl.user_id_from_username(username))
-    result = cl.direct_send_photo(path, user_id)
-    return result
+# @router.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
+# async def send_direct_photo_by_username(sessionid: str = Form(...), path: str = Form('/fata.jpg'), username: str = Form(...), clients: ClientStorage = Depends(get_clients)):
+#     cl = clients.get(sessionid)
+#     user_id = int(cl.user_id_from_username(username))
+#     result = cl.direct_send_photo(path, user_id)
+#     return result
 
 #HASHTAG
 
