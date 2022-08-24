@@ -15,7 +15,7 @@ from dependencies import ClientStorage, get_clients
 
 
 app = FastAPI()
-router = APIRouter()
+router = APIRouter(prefix = '/instagram/engine/instagrapi')
 
 
 
