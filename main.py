@@ -15,7 +15,7 @@ from dependencies import ClientStorage, get_clients
 
 
 app = FastAPI()
-router = APIRouter(prefix='/instagram/engine/instagrapi')
+router = APIRouter()
 
 
 
@@ -24,7 +24,7 @@ async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
     return get_swagger_ui_html(
-        openapi_url='/instagram/engine/instagrapi/openapi.json',
+        openapi_url='/openapi.json',
         title="API Swagger",
     )
 
