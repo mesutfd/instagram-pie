@@ -298,8 +298,8 @@ async def handle_exception(request, exc: Exception):
 
 
 def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
+    # if app.openapi_schema:
+    #     return app.openapi_schema
     # for route in app.routes:
     #     body_field = getattr(route, 'body_field', None)
     #     if body_field:
