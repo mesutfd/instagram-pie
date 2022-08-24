@@ -284,7 +284,7 @@ async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), client
 
 
 
-app.include_router(router)
+app.include_router(router,prefix = '/instagram/engine/instagrapi')
 
 
 #End Routers
