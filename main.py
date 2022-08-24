@@ -19,7 +19,7 @@ router = APIRouter(prefix = '/instagram/engine/instagrapi')
 
 
 
-@router.get("/", tags=["system"], summary="Show Docs")
+@app.get("/", tags=["system"], summary="Show Docs")
 async def root(request: Request):
     """Redirect to /instagram/engine/instagrapi/docs
     """
