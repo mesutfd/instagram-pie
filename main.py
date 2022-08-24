@@ -14,7 +14,7 @@ from instagrapi.types import Media, Location, Usertag, UserShort, User, Story
 from dependencies import ClientStorage, get_clients
 
 
-app = FastAPI()
+app = FastAPI(root_path='/instagram/engine/instagrapi')
 router = APIRouter()
 
 
@@ -284,7 +284,7 @@ async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), client
 
 
 
-app.include_router(router,prefix = '/instagram/engine/instagrapi')
+app.include_router(router)
 
 
 #End Routers
