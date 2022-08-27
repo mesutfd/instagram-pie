@@ -182,6 +182,7 @@ async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), a
     cl = clients.get(sessionid)
     followers = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
     try:
+        print(followers)
         return followers
     except:
         return followers
