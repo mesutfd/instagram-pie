@@ -1,6 +1,6 @@
 import pkg_resources
 
-from fastapi import FastAPI, Request, APIRouter
+from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.responses import JSONResponse
@@ -14,8 +14,7 @@ from instagrapi.types import Media, Location, Usertag, UserShort, User, Story
 from dependencies import ClientStorage, get_clients
 
 
-app = FastAPI()
-router = APIRouter()
+app = FastAPI(root_path='/instagram/engine/instagrapi')
 
 
 
@@ -28,7 +27,7 @@ async def root(request: Request):
         title="API Swagger",
     )
 
-@router.get("/version", tags=["system"], summary="Get dependency versions")
+@app.get("/version", tags=["system"], summary="Get dependency versions")
 async def version():
     """Get dependency versions
     """
@@ -43,7 +42,7 @@ async def version():
 
 #AUTH
 
-@router.post("/auth/login", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.post("/auth/login", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_login(username: str = Form(...), password: str = Form(...), verification_code: Optional[str] = Form(""), proxy: Optional[str] = Form(""), locale: Optional[str] = Form(""), timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
@@ -67,7 +66,7 @@ async def auth_login(username: str = Form(...), password: str = Form(...), verif
         return cl.sessionid
     return result
 
-@router.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_relogin(sessionid: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
     """Relogin by username and password (with clean cookies)
     """
@@ -75,14 +74,14 @@ async def auth_relogin(sessionid: str = Form(...), clients: ClientStorage = Depe
     result = cl.relogin()
     return result
 
-@router.get("/auth/settings/get", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.get("/auth/settings/get", tags=["auth"], responses={404: {"description": "Not found"}})
 async def settings_get(sessionid: str, clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get client's settings
     """
     cl = clients.get(sessionid)
     return cl.get_settings()
 
-@router.post("/auth/settings/set", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.post("/auth/settings/set", tags=["auth"], responses={404: {"description": "Not found"}})
 async def settings_set(settings: str = Form(...), sessionid: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Set client's settings
     """
@@ -95,7 +94,7 @@ async def settings_set(settings: str = Form(...), sessionid: Optional[str] = For
     clients.set(cl)
     return cl.sessionid
 
-@router.get("/auth/timeline_feed", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.get("/auth/timeline_feed", tags=["auth"], responses={404: {"description": "Not found"}})
 async def timeline_feed(sessionid: str, clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get your timeline feed
     """
@@ -104,40 +103,40 @@ async def timeline_feed(sessionid: str, clients: ClientStorage = Depends(get_cli
 
 #MEDIA
 
-@router.get("/media/pk_from_code", tags=["media"], responses={404: {"description": "Not found"}})
+@app.get("/media/pk_from_code", tags=["media"], responses={404: {"description": "Not found"}})
 async def media_pk_from_code(code: str) -> str:
     """Get media pk from code
     """
     return str(Client().media_pk_from_code(code))
 
-@router.get("/media/pk_from_url", tags=["media"], responses={404: {"description": "Not found"}})
+@app.get("/media/pk_from_url", tags=["media"], responses={404: {"description": "Not found"}})
 async def media_pk_from_url(url: str) -> str:
     """Get Media PK from URL
     """
     return str(Client().media_pk_from_url(url))
 
-@router.post("/media/info", response_model=Media, tags=["media"], responses={404: {"description": "Not found"}})
+@app.post("/media/info", response_model=Media, tags=["media"], responses={404: {"description": "Not found"}})
 async def media_info(sessionid: str = Form(...), pk: int = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> Media:
     """Get media info by pk
     """
     cl = clients.get(sessionid)
     return cl.media_info(pk, use_cache)
 
-@router.post("/media/user_medias", response_model=List[Media], tags=["media"], responses={404: {"description": "Not found"}})
+@app.post("/media/user_medias", response_model=List[Media], tags=["media"], responses={404: {"description": "Not found"}})
 async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
     cl = clients.get(sessionid)
     return cl.user_medias(user_id, amount)
 
-@router.post("/media/likers", response_model=List[UserShort], tags=["media"], responses={404: {"description": "Not found"}})
+@app.post("/media/likers", response_model=List[UserShort], tags=["media"], responses={404: {"description": "Not found"}})
 async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     """Get user's likers
     """
     cl = clients.get(sessionid)
     return cl.media_likers(media_id)
 
-@router.post("/media/tagged_post_by_id")
+@app.post("/media/tagged_post_by_id")
 async def get_tagged_posts_by_user_id(
         sessionid: str = Form(...),
         userid: int = Form(...),
@@ -152,7 +151,7 @@ async def get_tagged_posts_by_user_id(
 
     return posts
 
-@router.post("/media/tagged_post_by_username")
+@app.post("/media/tagged_post_by_username")
 async def get_tagged_posts_by_user_name(
         sessionid: str = Form(...),
         username: str = Form(...),
@@ -170,42 +169,42 @@ async def get_tagged_posts_by_user_name(
 
 #USER
 
-@router.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers
     """
     cl = clients.get(sessionid)
     return cl.user_followers(user_id, use_cache, amount)
 
-@router.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers information
     """
     cl = clients.get(sessionid)
     return cl.user_following(user_id, use_cache, amount)
 
-@router.post("/user/info", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/info", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from user id
     """
     cl = clients.get(sessionid)
     return cl.user_info(user_id, use_cache)
 
-@router.post("/user/info_by_username", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/info_by_username", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info_by_username(sessionid: str = Form(...), username: str = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from username
     """
     cl = clients.get(sessionid)
     return cl.user_info_by_username(username, use_cache)
 
-@router.post("/user/id_from_username", response_model=int, tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/id_from_username", response_model=int, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_id_from_username(sessionid: str = Form(...), username: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> int:
     """Get user id from username
     """
     cl = clients.get(sessionid)
     return cl.user_id_from_username(username)
 
-@router.post("/user/username_from_id", response_model=str, tags=["user"], responses={404: {"description": "Not found"}})
+@app.post("/user/username_from_id", response_model=str, tags=["user"], responses={404: {"description": "Not found"}})
 async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
     """Get username from user id
     """
@@ -214,14 +213,14 @@ async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(
 
 #STORY
 
-@router.post("/story/user_stories", response_model=List[Story], tags=["story"], responses={404: {"description": "Not found"}})
+@app.post("/story/user_stories", response_model=List[Story], tags=["story"], responses={404: {"description": "Not found"}})
 async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(None), clients: ClientStorage = Depends(get_clients)) -> List[Story]:
     """Get a user's stories
     """
     cl = clients.get(sessionid)
     return cl.user_stories(user_id, amount)
 
-@router.post("/story/info", response_model=Story, tags=["story"], responses={404: {"description": "Not found"}})
+@app.post("/story/info", response_model=Story, tags=["story"], responses={404: {"description": "Not found"}})
 async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_cache: Optional[bool] = Form(True), clients: ClientStorage = Depends(get_clients)) -> Story:
     """Get Story by pk or id
     """
@@ -230,7 +229,7 @@ async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_
 
 #DIRECT
 
-@router.post('/direct/send_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
+@app.post('/direct/send_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_message_by_username(sessionid: str = Form(...), target_username: str = Form(...), message_body: str = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     taken_username = cl.user_id_from_username(target_username)
@@ -238,19 +237,19 @@ async def send_direct_message_by_username(sessionid: str = Form(...), target_use
     result = cl.direct_send(message_body, [taken_user_id, ])
     return result
 
-@router.post('/direct/send_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
+@app.post('/direct/send_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
 async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: int = Form(...), message_body: str = Form(...), clients: ClientStorage = Depends(get_clients),):
     cl = clients.get(sessionid)
     result = cl.direct_send(message_body, [target_userid, ])
     return result
 
-# @router.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
+# @app.post('/direct/send_photo_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
 # async def send_direct_photo_by_id(sessionid: str = Form(...), path: str = Form('/fata.jpg'), user_id: list[int] = Form(...), clients: ClientStorage = Depends(get_clients)):
 #     cl = clients.get(sessionid)
 #     result = cl.direct_send_photo(path, user_id)
 #     return result
 
-# @router.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
+# @app.post('/direct/send_photo_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
 # async def send_direct_photo_by_username(sessionid: str = Form(...), path: str = Form('/fata.jpg'), username: str = Form(...), clients: ClientStorage = Depends(get_clients)):
 #     cl = clients.get(sessionid)
 #     user_id = int(cl.user_id_from_username(username))
@@ -259,7 +258,7 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
 
 #HASHTAG
 
-@router.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
+@app.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result = cl.hashtag_medias_top(
@@ -267,7 +266,7 @@ async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount:
         amount=amount)
     return result
 
-@router.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
+@app.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result = cl.hashtag_medias_recent(
@@ -275,7 +274,7 @@ async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amou
         amount=amount)
     return result
 
-@router.post('/hashtag/get_hashtag_info', tags=["hashtag"], responses={404: {"description": "Not found"}})
+@app.post('/hashtag/get_hashtag_info', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result = cl.hashtag_info(
@@ -284,7 +283,6 @@ async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), client
 
 
 
-app.include_router(router)
 
 
 #End Routers
