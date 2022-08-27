@@ -182,9 +182,8 @@ async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), a
     cl = clients.get(sessionid)
     followers, _end_cursor = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
     try:
-        if type(followers[0]) == UserShort:
-            followers = followers.append({'end_cursor':_end_cursor})
-            return followers
+        followers = followers.append({'end_cursor':_end_cursor})
+        return followers
     except:
         return followers
     return followers
