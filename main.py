@@ -123,11 +123,15 @@ async def media_info(sessionid: str = Form(...), pk: int = Form(...), use_cache:
     return cl.media_info(pk, use_cache)
 
 @app.post("/media/user_medias", response_model=List[Media], tags=["media"], responses={404: {"description": "Not found"}})
-async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
+async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), sleep: Optional[int] = Form(2), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
     cl = clients.get(sessionid)
-    return cl.user_medias(user_id, amount)
+    medias, _end_cursor = cl.user_medias_paginated_gql(user_id, amount, sleep, end_cursor)
+    if type(medias) == List[Media]:
+        return {**medias, **{'end_cursor':_end_cursor}}
+    else:
+        return medias
 
 @app.post("/media/likers", response_model=List[UserShort], tags=["media"], responses={404: {"description": "Not found"}})
 async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
@@ -136,7 +140,12 @@ async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), cl
     cl = clients.get(sessionid)
     return cl.media_likers(media_id)
 
-@app.post("/media/tagged_post_by_id")
+@app.post('/media/comments', tags=["media"], responses={404: {"description": "Not found"}})
+async def get_comments(sessionid: str = Form(...), media_id:str = Form(...), amount: int = Form(30), clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    return cl.media_comments(media_id, amount)
+
+@app.post("/media/tagged_post_by_id", tags=["media"], responses={404: {"description": "Not found"}})
 async def get_tagged_posts_by_user_id(
         sessionid: str = Form(...),
         userid: int = Form(...),
@@ -151,7 +160,7 @@ async def get_tagged_posts_by_user_id(
 
     return posts
 
-@app.post("/media/tagged_post_by_username")
+@app.post("/media/tagged_post_by_username", tags=["media"], responses={404: {"description": "Not found"}})
 async def get_tagged_posts_by_user_name(
         sessionid: str = Form(...),
         username: str = Form(...),
@@ -170,11 +179,15 @@ async def get_tagged_posts_by_user_name(
 #USER
 
 @app.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
-async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
+async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(20), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers
     """
     cl = clients.get(sessionid)
-    return cl.user_followers(user_id, use_cache, amount)
+    followers, _end_cursor = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
+    if type(followers) == List[UserShort]:
+        return {**followers,**{'end_cursor':_end_cursor}}
+    else:
+        return followers
 
 @app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
@@ -259,20 +272,30 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
 #HASHTAG
 
 @app.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
+async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
-    result = cl.hashtag_medias_top(
+    result, _end_cursor = cl.hashtag_medias_v1_chunk(
         name=name,
-        amount=amount)
-    return result
+        amount=amount,
+        tab_key='top',
+        max_id=end_cursor)
+    if type(result) == List(Media):
+        return {**result, **{'end_cursor':_end_cursor}}
+    else:
+        return result
 
 @app.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(9), clients: ClientStorage = Depends(get_clients)):
+async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
-    result = cl.hashtag_medias_recent(
+    result, _end_cursor = cl.hashtag_medias_v1_chunk(
         name=name,
-        amount=amount)
-    return result
+        amount=amount,
+        tab_key='recent',
+        max_id=end_cursor)
+    if type(result) == List(Media):
+        return {**result, **{'end_cursor':_end_cursor}}
+    else:
+        return result
 
 @app.post('/hashtag/get_hashtag_info', tags=["hashtag"], responses={404: {"description": "Not found"}})
 async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), clients: ClientStorage = Depends(get_clients)):
