@@ -224,6 +224,16 @@ async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(
     cl = clients.get(sessionid)
     return cl.username_from_user_id(user_id)
 
+@app.post('/user/search_follower', tags=["user"], responses={404: {"description": "Not found"}})
+async def search_followers(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...), clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    return cl.search_followers(user_id, query)
+
+@app.post('/user/search_following', tags=["user"], responses={404: {"description": "Not found"}})
+async def search_followings(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...), clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    return cl.search_following(user_id, query)
+
 #STORY
 
 @app.post("/story/user_stories", response_model=List[Story], tags=["story"], responses={404: {"description": "Not found"}})
