@@ -123,7 +123,7 @@ async def media_info(sessionid: str = Form(...), pk: int = Form(...), use_cache:
     return cl.media_info(pk, use_cache)
 
 @app.post("/media/user_medias", response_model=List[Media], tags=["media"], responses={404: {"description": "Not found"}})
-async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), sleep: Optional[int] = Form(2), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
+async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50), sleep: Optional[int] = Form(2), end_cursor: Optional[str] = Form(None), clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
     cl = clients.get(sessionid)
