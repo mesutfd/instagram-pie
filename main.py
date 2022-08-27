@@ -42,7 +42,7 @@ async def version():
 
 #AUTH
 
-@app.post("/instagram/engine/instagrapi/auth/login", tags=["auth"], responses={404: {"description": "Not found"}})
+@app.post("/auth/login", tags=["auth"], responses={404: {"description": "Not found"}})
 async def auth_login(username: str = Form(...), password: str = Form(...), verification_code: Optional[str] = Form(""), proxy: Optional[str] = Form(""), locale: Optional[str] = Form(""), timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
