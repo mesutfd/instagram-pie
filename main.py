@@ -187,6 +187,7 @@ async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), a
             return followers
     except:
         return followers
+    return followers
 
 @app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
