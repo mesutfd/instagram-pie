@@ -14,7 +14,7 @@ from instagrapi.types import Media, Location, Usertag, UserShort, User, Story
 from dependencies import ClientStorage, get_clients
 
 
-app = FastAPI()
+app = FastAPI(root_path='/instagram/engine/instagrapi')
 
 
 
