@@ -180,8 +180,8 @@ async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), a
     """Get user's followers
     """
     cl = clients.get(sessionid)
-    followers, _end_cursor = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
-    return followers.append({'end_cursor':_end_cursor})
+    followers = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
+    return followers
 
 @app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
 async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True), amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
