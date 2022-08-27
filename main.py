@@ -176,14 +176,13 @@ async def get_tagged_posts_by_user_name(
 #USER
 
 @app.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"], responses={404: {"description": "Not found"}})
-async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(20), end_cursor: Optional[str] = Form(None), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
+async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(12), end_cursor: Optional[str] = Form(None), clients: ClientStorage = Depends(get_clients)) -> Dict[int, UserShort]:
     """Get user's followers
     """
     cl = clients.get(sessionid)
     followers = cl.user_followers_gql_chunk(user_id, amount, end_cursor)
     try:
-        print(followers)
-        return str(followers)
+        return followers
     except:
         return followers
 
