@@ -272,7 +272,7 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
 #HASHTAG
 
 @app.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)):
+async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(None), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result, _end_cursor = cl.hashtag_medias_v1_chunk(
         name=name,
@@ -285,7 +285,7 @@ async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount:
         return result
 
 @app.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(...), clients: ClientStorage = Depends(get_clients)):
+async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), end_cursor: Optional[str] = Form(None), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid)
     result, _end_cursor = cl.hashtag_medias_v1_chunk(
         name=name,
