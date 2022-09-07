@@ -249,7 +249,7 @@ async def send_direct_message_by_username(sessionid: str = Form(...), target_use
     cl = clients.get(sessionid)
     taken_username = cl.user_id_from_username(target_username)
     taken_user_id = int(taken_username)
-    result = cl.direct_send(message_body, [taken_user_id, ])
+    result = cl.direct_send(f"{message_body}", [taken_user_id, ])
     return result
 
 @app.post('/direct/send_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
