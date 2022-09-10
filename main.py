@@ -268,6 +268,7 @@ async def search_followings(sessionid: str = Form(...), user_id: int = Form(...)
 
 
 # account behavior settings
+@app.post('/user/update_user_profile_pic', tags=["user"], responses={404: {"description": "Not found"}})
 async def update_user_profile_pic(
         sessionid: str = Form(...),
         clients: ClientStorage = Depends(get_clients)
@@ -277,6 +278,7 @@ async def update_user_profile_pic(
     return cl.account_change_picture(path=Path(f'profile_static_pics/{random_number}.jpg'))
 
 
+@app.post('/user/account_bio', tags=["user"], responses={404: {"description": "Not found"}})
 async def account_bio(
         sessionid: str = Form(...),
         text: str = Form(...),
@@ -286,6 +288,7 @@ async def account_bio(
     return cl.account_set_biography(text)
 
 
+@app.post('/user/account_set_private', tags=["user"], responses={404: {"description": "Not found"}})
 async def account_set_private(
         sessionid: str = Form(...),
         clients: ClientStorage = Depends(get_clients)
@@ -293,6 +296,8 @@ async def account_set_private(
     cl = clients.get(sessionid)
     return cl.account_set_private()
 
+
+@app.post('/user/account_set_public', tags=["user"], responses={404: {"description": "Not found"}})
 async def account_set_public(
         sessionid: str = Form(...),
         clients: ClientStorage = Depends(get_clients)
