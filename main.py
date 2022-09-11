@@ -1,18 +1,16 @@
-import random
-
-import lorem
-import pkg_resources
-from pathlib import Path
-from fastapi import FastAPI, Request
-from fastapi.openapi.utils import get_openapi
-from fastapi.openapi.docs import get_swagger_ui_html
-from starlette.responses import JSONResponse
-from typing import List, Optional, Dict
-from pathlib import Path
 import json
+import random
+from pathlib import Path
+from typing import List, Optional, Dict
+
+import pkg_resources
+from fastapi import Depends, Form
+from fastapi import FastAPI, Request
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.utils import get_openapi
 from instagrapi import Client
-from fastapi import Depends, File, UploadFile, Form
-from instagrapi.types import Media, Location, Usertag, UserShort, User, Story
+from instagrapi.types import Media, UserShort, User, Story
+from starlette.responses import JSONResponse
 
 from dependencies import ClientStorage, get_clients
 
@@ -312,7 +310,7 @@ async def story_random_pic(
         sessionid: str = Form(...),
         clients: ClientStorage = Depends(get_clients)
 ):
-    lorem_ipsum = lorem.paragraph()
+    lorem_ipsum = 'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.'
     cl = clients.get(sessionid)
     random_number = random.randint(1, 7)
     return cl.photo_upload_to_story(path=Path(f'profile_static_pics/{random_number}.jpg', lorem_ipsum))
@@ -323,7 +321,7 @@ async def post_random_pic(
         sessionid: str = Form(...),
         clients: ClientStorage = Depends(get_clients)
 ):
-    lorem_ipsum = lorem.paragraph()
+    lorem_ipsum = 'In publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before final copy is available.'
     cl = clients.get(sessionid)
     random_number = random.randint(1, 7)
     return cl.photo_upload_to_story(path=Path(f'profile_static_pics/{random_number}.jpg', lorem_ipsum))
