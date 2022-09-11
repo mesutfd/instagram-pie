@@ -1,5 +1,6 @@
 import random
 
+import lorem
 import pkg_resources
 from pathlib import Path
 from fastapi import FastAPI, Request
@@ -305,6 +306,27 @@ async def account_set_public(
     cl = clients.get(sessionid)
     return cl.account_set_public()
 
+
+@app.post('/user/story_random_pic', tags=["user"], responses={404: {"description": "Not found"}})
+async def story_random_pic(
+        sessionid: str = Form(...),
+        clients: ClientStorage = Depends(get_clients)
+):
+    lorem_ipsum = lorem.paragraph()
+    cl = clients.get(sessionid)
+    random_number = random.randint(1, 7)
+    return cl.photo_upload_to_story(path=Path(f'profile_static_pics/{random_number}.jpg', lorem_ipsum))
+
+
+@app.post('/user/post_random_pic', tags=["user"], responses={404: {"description": "Not found"}})
+async def post_random_pic(
+        sessionid: str = Form(...),
+        clients: ClientStorage = Depends(get_clients)
+):
+    lorem_ipsum = lorem.paragraph()
+    cl = clients.get(sessionid)
+    random_number = random.randint(1, 7)
+    return cl.photo_upload_to_story(path=Path(f'profile_static_pics/{random_number}.jpg', lorem_ipsum))
 
 
 # STORY
