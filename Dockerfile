@@ -1,5 +1,5 @@
 FROM python:3.8-slim
-RUN apt-get update \
+# RUN apt-get update \
     && apt-get install gcc ffmpeg -y \
     && apt-get clea
 EXPOSE 8000
