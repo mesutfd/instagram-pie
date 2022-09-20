@@ -10,7 +10,7 @@ from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from instagrapi import Client
 from instagrapi.types import Media, UserShort, User, Story
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
 
 from dependencies import ClientStorage, get_clients
 
@@ -337,7 +337,6 @@ async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...
     cl = clients.get(sessionid)
     return cl.user_stories(user_id, amount)
 
-
 @app.post("/story/info", response_model=Story, tags=["story"], responses={404: {"description": "Not found"}})
 async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_cache: Optional[bool] = Form(True),
                      clients: ClientStorage = Depends(get_clients)) -> Story:
@@ -345,6 +344,158 @@ async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_
     """
     cl = clients.get(sessionid)
     return cl.story_info(story_pk, use_cache)
+
+#Download
+
+@app.post("/story/download_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+async def story_download_by_url(sessionid: str = Form(...),
+                                url: str = Form(...),
+                                filename: Optional[str] = Form(""),
+                                folder: Optional[Path] = Form(""),
+                                returnFile: Optional[bool] = Form(True),
+                                clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.story_download_by_url(url, filename, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/story/download_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+async def story_download(sessionid: str = Form(...),
+                         story_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         folder: Optional[Path] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.story_download(story_pk, filename, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_photo_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+async def photo_download(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         folder: Optional[Path] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.photo_download(media_pk, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_photo_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+async def photo_download_by_urll(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.photo_download_by_url(media_pk, filename)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_video_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+async def video_download(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         folder: Optional[Path] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.video_download(media_pk, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_video_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+async def video_download_by_urll(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.video_download_by_url(media_pk, filename)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_album_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+async def album_download(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         folder: Optional[Path] = Form(""),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.album_download(media_pk, folder)
+    return result
+
+@app.post("/media/download_album_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+async def album_download_by_urll(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.album_download_by_urls(media_pk, filename)
+    return result
+
+@app.post("/media/download_igtv_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+async def igtv_download(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         folder: Optional[Path] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.igtv_download(media_pk, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_igtv_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+async def igtv_download_by_urll(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.igtv_download_by_url(media_pk, filename)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_clip_by_pk", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+async def clip_download(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         folder: Optional[Path] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.clip_download(media_pk, folder)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
+
+@app.post("/media/download_clip_by_url", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+async def clip_download_by_urll(sessionid: str = Form(...),
+                         media_pk: int = Form(...),
+                         filename: Optional[str] = Form(""),
+                         returnFile: Optional[bool] = Form(True),
+                         clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    result = cl.clip_download_by_url(media_pk, filename)
+    if returnFile:
+        return FileResponse(result)
+    else:
+        return result
 
 
 # DIRECT
@@ -404,6 +555,13 @@ async def hashtag_info(sessionid: str = Form(...), name: str = Form(...),
         name=name, )
     return result
 
+#Highlight
+
+@app.post('/highlight/user_highlights', tags=["highlight"], responses={404: {"description": "Not found"}})
+async def hashtag_top(sessionid: str = Form(...), user_id: str = Form(...), amount: int = Form(5),
+                      clients: ClientStorage = Depends(get_clients)):
+    cl = clients.get(sessionid)
+    return cl.user_highlights(user_id, amount)
 
 # End Routers
 
