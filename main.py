@@ -347,7 +347,7 @@ async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_
 
 #Download
 
-@app.post("/story/download_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_story_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
 async def story_download_by_url(sessionid: str = Form(...),
                                 url: str = Form(...),
                                 filename: Optional[str] = Form(""),
@@ -361,7 +361,7 @@ async def story_download_by_url(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/story/download_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_story_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
 async def story_download(sessionid: str = Form(...),
                          story_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -375,7 +375,7 @@ async def story_download(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_photo_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_photo_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
 async def photo_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
@@ -388,7 +388,7 @@ async def photo_download(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_photo_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_photo_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
 async def photo_download_by_urll(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -401,7 +401,7 @@ async def photo_download_by_urll(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_video_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_video_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
 async def video_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
@@ -414,7 +414,7 @@ async def video_download(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_video_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_video_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
 async def video_download_by_urll(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -427,7 +427,7 @@ async def video_download_by_urll(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_album_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_album_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
 async def album_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
@@ -436,7 +436,7 @@ async def album_download(sessionid: str = Form(...),
     result = cl.album_download(media_pk, folder)
     return result
 
-@app.post("/media/download_album_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_album_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
 async def album_download_by_urll(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -445,7 +445,7 @@ async def album_download_by_urll(sessionid: str = Form(...),
     result = cl.album_download_by_urls(media_pk, filename)
     return result
 
-@app.post("/media/download_igtv_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_igtv_by_pk", tags=["Download"], responses={404: {"description": "Not found"}})
 async def igtv_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
@@ -458,7 +458,7 @@ async def igtv_download(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_igtv_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
+@app.post("/download/download_igtv_by_url", tags=["Download"], responses={404: {"description": "Not found"}})
 async def igtv_download_by_urll(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
@@ -471,7 +471,7 @@ async def igtv_download_by_urll(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_clip_by_pk", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+@app.post("/download/download_clip_by_pk", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
 async def clip_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
@@ -484,7 +484,7 @@ async def clip_download(sessionid: str = Form(...),
     else:
         return result
 
-@app.post("/media/download_clip_by_url", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+@app.post("/download/download_clip_by_url", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
 async def clip_download_by_urll(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
