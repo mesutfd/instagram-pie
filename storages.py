@@ -3,6 +3,7 @@ from instagrapi import Client
 from tinydb import TinyDB, Query
 import json
 
+
 class ClientStorage:
     db = TinyDB('./db.json')
 
@@ -35,3 +36,4 @@ class ClientStorage:
 
     def close(self):
         pass
+
