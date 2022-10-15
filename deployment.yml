@@ -2,10 +2,10 @@
 kind: Deployment
 metadata:
   labels:
-    cattle.io/creator: [USERNAME]
+    cattle.io/creator: h.hashemi
     workload.user.cattle.io/workloadselector: deployment-instagrapi-engine
   name: instagrapi-engine
-  namespace: [NAMESPACE]
+  namespace: ha-instagram
 spec:
   progressDeadlineSeconds: 600
   replicas: 1
@@ -51,7 +51,7 @@ spec:
           # name: upload
       dnsPolicy: ClusterFirst
       imagePullSecrets:
-        - name: [NAME]
+        - name: hashemi
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
