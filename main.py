@@ -49,10 +49,12 @@ async def auth_login(username: str = Form(...), password: str = Form(...), verif
                      timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
-    cl = clients.client()
+    
     if proxy != "":
-        cl.set_proxy(proxy)
-
+        cl = clients.client(proxy)
+    else:
+        cl = clients.client()
+        
     if locale != "":
         cl.set_locale(locale)
 
@@ -226,11 +228,12 @@ async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_ca
 
 @app.post("/user/info_by_username", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info_by_username(sessionid: str = Form(...), username: str = Form(...),
+                                proxy : str = Form(...),
                                 use_cache: Optional[bool] = Form(True),
                                 clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from username
     """
-    cl = clients.get(sessionid)
+    cl = clients.get(sessionid, proxy)
     return cl.user_info_by_username(username, use_cache)
 
 
