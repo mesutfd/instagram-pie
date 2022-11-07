@@ -14,13 +14,16 @@ class ClientStorage:
         cl.request_timeout = 0.1
         return cl
 
-    def get(self, sessionid: str) -> Client:
+    def get(self, sessionid: str, proxy: str | None = None) -> Client:
         """Get client settings
         """
         key = parse.unquote(sessionid.strip(" \""))
         try:
             settings = json.loads(self.db.search(Query().sessionid == key)[0]['settings'])
-            cl = Client()
+            if proxy:
+                cl = Client(proxy=proxy)
+            else:
+                cl = Client()
             cl.set_settings(settings)
             cl.get_timeline_feed()
             return cl
