@@ -49,12 +49,10 @@ async def auth_login(username: str = Form(...), password: str = Form(...), verif
                      timezone: Optional[str] = Form(""), clients: ClientStorage = Depends(get_clients)) -> str:
     """Login by username and password with 2FA
     """
-    
+    cl = clients.client()
     if proxy != "":
-        cl = clients.client(proxy)
-    else:
-        cl = clients.client()
-        
+        cl.set_proxy(proxy)
+    
     if locale != "":
         cl.set_locale(locale)
 
@@ -82,11 +80,11 @@ async def auth_relogin(sessionid: str = Form(...), proxy : str = Form(...), clie
 
 
 @app.get("/auth/settings/get", tags=["auth"], responses={404: {"description": "Not found"}})
-async def settings_get(sessionid: str, proxy : str = Form(...), clients: ClientStorage = Depends(get_clients)) -> Dict:
+async def settings_get(sessionid: str, proxy : str, clients: ClientStorage = Depends(get_clients)) -> Dict:
     """Get client's settings
     """
     cl = clients.get(sessionid, proxy)
-    return cl.get_settings()
+    return str(cl.get_settings())
 
 
 # @app.post("/auth/settings/set", tags=["auth"], responses={404: {"description": "Not found"}})
