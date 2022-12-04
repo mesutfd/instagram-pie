@@ -11,10 +11,20 @@ from fastapi.openapi.utils import get_openapi
 from instagrapi import Client
 from instagrapi.types import Media, UserShort, User, Story
 from starlette.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from dependencies import ClientStorage, get_clients
 
 app = FastAPI()
+
+# CORS settings
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/", tags=["system"], summary="Show Docs")
@@ -52,7 +62,7 @@ async def auth_login(username: str = Form(...), password: str = Form(...), verif
     cl = clients.client()
     if proxy != "":
         cl.set_proxy(proxy)
-    
+
     if locale != "":
         cl.set_locale(locale)
 
@@ -71,7 +81,8 @@ async def auth_login(username: str = Form(...), password: str = Form(...), verif
 
 
 @app.post("/auth/relogin", tags=["auth"], responses={404: {"description": "Not found"}})
-async def auth_relogin(sessionid: str = Form(...), proxy : str = Form(...), clients: ClientStorage = Depends(get_clients)) -> str:
+async def auth_relogin(sessionid: str = Form(...), proxy: str = Form(...),
+                       clients: ClientStorage = Depends(get_clients)) -> bool:
     """Relogin by username and password (with clean cookies)
     """
     cl = clients.get(sessionid, proxy)
@@ -80,7 +91,7 @@ async def auth_relogin(sessionid: str = Form(...), proxy : str = Form(...), clie
 
 
 @app.get("/auth/settings/get", tags=["auth"], responses={404: {"description": "Not found"}})
-async def settings_get(sessionid: str, proxy : str, clients: ClientStorage = Depends(get_clients)) -> Dict:
+async def settings_get(sessionid: str, proxy: str, clients: ClientStorage = Depends(get_clients)) -> str:
     """Get client's settings
     """
     cl = clients.get(sessionid, proxy)
@@ -113,21 +124,22 @@ async def settings_get(sessionid: str, proxy : str, clients: ClientStorage = Dep
 # MEDIA
 
 @app.get("/media/pk_from_code", tags=["media"], responses={404: {"description": "Not found"}})
-async def media_pk_from_code(code: str = Form(...), proxy : str = Form(...)) -> str:
+async def media_pk_from_code(code: str = Form(...), proxy: str = Form(...)) -> str:
     """Get media pk from code
     """
-    return str(Client(proxy = proxy).media_pk_from_code(code))
+    return str(Client(proxy=proxy).media_pk_from_code(code))
 
 
 @app.get("/media/pk_from_url", tags=["media"], responses={404: {"description": "Not found"}})
-async def media_pk_from_url(url: str = Form(...), proxy : str = Form(...)) -> str:
+async def media_pk_from_url(url: str = Form(...), proxy: str = Form(...)) -> str:
     """Get Media PK from URL
     """
-    return str(Client(proxy= proxy).media_pk_from_url(url))
+    return str(Client(proxy=proxy).media_pk_from_url(url))
 
 
 @app.post("/media/info", response_model=Media, tags=["media"], responses={404: {"description": "Not found"}})
-async def media_info(sessionid: str = Form(...), pk: int = Form(...), proxy : str = Form(...), use_cache: Optional[bool] = Form(True),
+async def media_info(sessionid: str = Form(...), pk: int = Form(...), proxy: str = Form(...),
+                     use_cache: Optional[bool] = Form(True),
                      clients: ClientStorage = Depends(get_clients)) -> Media:
     """Get media info by pk
     """
@@ -137,7 +149,8 @@ async def media_info(sessionid: str = Form(...), pk: int = Form(...), proxy : st
 
 @app.post("/media/user_medias", response_model=List[Media], tags=["media"],
           responses={404: {"description": "Not found"}})
-async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50),proxy : str = Form(...),
+async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amount: Optional[int] = Form(50),
+                      proxy: str = Form(...),
                       clients: ClientStorage = Depends(get_clients)) -> List[Media]:
     """Get a user's media
     """
@@ -147,16 +160,17 @@ async def user_medias(sessionid: str = Form(...), user_id: int = Form(...), amou
 
 @app.post("/media/likers", response_model=List[UserShort], tags=["media"],
           responses={404: {"description": "Not found"}})
-async def media_likers(sessionid: str = Form(...), media_id: str = Form(...),proxy : str = Form(...),
+async def media_likers(sessionid: str = Form(...), media_id: str = Form(...), proxy: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     """Get user's likers
     """
-    cl = clients.get(sessionid,proxy)
+    cl = clients.get(sessionid, proxy)
     return cl.media_likers(media_id)
 
 
 @app.post('/media/comments', tags=["media"], responses={404: {"description": "Not found"}})
-async def get_comments(sessionid: str = Form(...), media_id: str = Form(...), amount: int = Form(30),proxy : str = Form(...),
+async def get_comments(sessionid: str = Form(...), media_id: str = Form(...), amount: int = Form(30),
+                       proxy: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.media_comments(media_id, amount)
@@ -167,7 +181,7 @@ async def get_tagged_posts_by_user_id(
         sessionid: str = Form(...),
         userid: int = Form(...),
         amount: int = Form(...),
-        proxy : str = Form(...),
+        proxy: str = Form(...),
         sleep: Optional[int] = Form(2),
         clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     cl = clients.get(sessionid, proxy)
@@ -182,7 +196,7 @@ async def get_tagged_posts_by_user_name(
         sessionid: str = Form(...),
         username: str = Form(...),
         amount: int = Form(...),
-        proxy : str = Form(...),
+        proxy: str = Form(...),
         sleep: Optional[int] = Form(2),
         clients: ClientStorage = Depends(get_clients)) -> List[UserShort]:
     cl = clients.get(sessionid, proxy)
@@ -197,9 +211,10 @@ async def get_tagged_posts_by_user_name(
 
 @app.post("/user/followers", response_model=Dict[int, UserShort], tags=["user"],
           responses={404: {"description": "Not found"}})
-async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),proxy : str = Form(...),
+async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),
+                         proxy: str = Form(...),
                          amount: Optional[int] = Form(12), clients: ClientStorage = Depends(get_clients)) -> Dict[
-        int, UserShort]:
+    int, UserShort]:
     """Get user's followers
     """
     cl = clients.get(sessionid, proxy)
@@ -208,9 +223,10 @@ async def user_followers(sessionid: str = Form(...), user_id: str = Form(...), u
 
 @app.post("/user/following", response_model=Dict[int, UserShort], tags=["user"],
           responses={404: {"description": "Not found"}})
-async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),proxy : str = Form(...),
+async def user_following(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),
+                         proxy: str = Form(...),
                          amount: Optional[int] = Form(0), clients: ClientStorage = Depends(get_clients)) -> Dict[
-        int, UserShort]:
+    int, UserShort]:
     """Get user's followers information
     """
     cl = clients.get(sessionid, proxy)
@@ -218,7 +234,8 @@ async def user_following(sessionid: str = Form(...), user_id: str = Form(...), u
 
 
 @app.post("/user/info", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
-async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),proxy : str = Form(...),
+async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_cache: Optional[bool] = Form(True),
+                    proxy: str = Form(...),
                     clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from user id
     """
@@ -228,7 +245,7 @@ async def user_info(sessionid: str = Form(...), user_id: str = Form(...), use_ca
 
 @app.post("/user/info_by_username", response_model=User, tags=["user"], responses={404: {"description": "Not found"}})
 async def user_info_by_username(sessionid: str = Form(...), username: str = Form(...),
-                                proxy : str = Form(...),
+                                proxy: str = Form(...),
                                 use_cache: Optional[bool] = Form(True),
                                 clients: ClientStorage = Depends(get_clients)) -> User:
     """Get user object from username
@@ -238,7 +255,7 @@ async def user_info_by_username(sessionid: str = Form(...), username: str = Form
 
 
 @app.post("/user/id_from_username", response_model=int, tags=["user"], responses={404: {"description": "Not found"}})
-async def user_id_from_username(sessionid: str = Form(...), username: str = Form(...),proxy : str = Form(...),
+async def user_id_from_username(sessionid: str = Form(...), username: str = Form(...), proxy: str = Form(...),
                                 clients: ClientStorage = Depends(get_clients)) -> int:
     """Get user id from username
     """
@@ -247,7 +264,7 @@ async def user_id_from_username(sessionid: str = Form(...), username: str = Form
 
 
 @app.post("/user/username_from_id", response_model=str, tags=["user"], responses={404: {"description": "Not found"}})
-async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(...),proxy : str = Form(...),
+async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(...), proxy: str = Form(...),
                                 clients: ClientStorage = Depends(get_clients)) -> str:
     """Get username from user id
     """
@@ -256,14 +273,16 @@ async def username_from_user_id(sessionid: str = Form(...), user_id: int = Form(
 
 
 @app.post('/user/search_follower', tags=["user"], responses={404: {"description": "Not found"}})
-async def search_followers(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...),proxy : str = Form(...),
+async def search_followers(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...),
+                           proxy: str = Form(...),
                            clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.search_followers(user_id, query)
 
 
 @app.post('/user/search_following', tags=["user"], responses={404: {"description": "Not found"}})
-async def search_followings(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...),proxy : str = Form(...),
+async def search_followings(sessionid: str = Form(...), user_id: int = Form(...), query: str = Form(...),
+                            proxy: str = Form(...),
                             clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.search_following(user_id, query)
@@ -272,7 +291,8 @@ async def search_followings(sessionid: str = Form(...), user_id: int = Form(...)
 # STORY
 @app.post("/story/user_stories", response_model=List[Story], tags=["story"],
           responses={404: {"description": "Not found"}})
-async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(None),proxy : str = Form(...),
+async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...), amount: Optional[int] = Form(None),
+                             proxy: str = Form(...),
                              clients: ClientStorage = Depends(get_clients)) -> List[Story]:
     """Get a user's stories
     """
@@ -281,12 +301,14 @@ async def story_user_stories(sessionid: str = Form(...), user_id: str = Form(...
 
 
 @app.post("/story/info", response_model=Story, tags=["story"], responses={404: {"description": "Not found"}})
-async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_cache: Optional[bool] = Form(True),proxy : str = Form(...),
+async def story_info(sessionid: str = Form(...), story_pk: int = Form(...), use_cache: Optional[bool] = Form(True),
+                     proxy: str = Form(...),
                      clients: ClientStorage = Depends(get_clients)) -> Story:
     """Get Story by pk or id
     """
     cl = clients.get(sessionid, proxy)
     return cl.story_info(story_pk, use_cache)
+
 
 # Download
 
@@ -296,7 +318,7 @@ async def story_download_by_url(sessionid: str = Form(...),
                                 url: str = Form(...),
                                 filename: Optional[str] = Form(""),
                                 folder: Optional[Path] = Form(""),
-                                proxy : str = Form(...),
+                                proxy: str = Form(...),
                                 returnFile: Optional[bool] = Form(True),
                                 clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -312,7 +334,7 @@ async def story_download(sessionid: str = Form(...),
                          story_pk: int = Form(...),
                          filename: Optional[str] = Form(""),
                          folder: Optional[Path] = Form(""),
-                         proxy : str = Form(...),
+                         proxy: str = Form(...),
                          returnFile: Optional[bool] = Form(True),
                          clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -327,7 +349,7 @@ async def story_download(sessionid: str = Form(...),
 async def photo_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
-                         proxy : str = Form(...),
+                         proxy: str = Form(...),
                          returnFile: Optional[bool] = Form(True),
                          clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -342,7 +364,7 @@ async def photo_download(sessionid: str = Form(...),
 async def photo_download_by_urll(sessionid: str = Form(...),
                                  media_pk: int = Form(...),
                                  filename: Optional[str] = Form(""),
-                                 proxy : str = Form(...),
+                                 proxy: str = Form(...),
                                  returnFile: Optional[bool] = Form(True),
                                  clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -357,7 +379,7 @@ async def photo_download_by_urll(sessionid: str = Form(...),
 async def video_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
-                         proxy : str = Form(...),
+                         proxy: str = Form(...),
                          returnFile: Optional[bool] = Form(True),
                          clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -372,7 +394,7 @@ async def video_download(sessionid: str = Form(...),
 async def video_download_by_urll(sessionid: str = Form(...),
                                  media_pk: int = Form(...),
                                  filename: Optional[str] = Form(""),
-                                 proxy : str = Form(...),
+                                 proxy: str = Form(...),
                                  returnFile: Optional[bool] = Form(True),
                                  clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -387,7 +409,7 @@ async def video_download_by_urll(sessionid: str = Form(...),
 async def album_download(sessionid: str = Form(...),
                          media_pk: int = Form(...),
                          folder: Optional[Path] = Form(""),
-                         proxy : str = Form(...),
+                         proxy: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     result = cl.album_download(media_pk, folder)
@@ -398,7 +420,7 @@ async def album_download(sessionid: str = Form(...),
 async def album_download_by_urll(sessionid: str = Form(...),
                                  media_pk: int = Form(...),
                                  filename: Optional[str] = Form(""),
-                                 proxy : str = Form(...),
+                                 proxy: str = Form(...),
                                  clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     result = cl.album_download_by_urls(media_pk, filename)
@@ -409,7 +431,7 @@ async def album_download_by_urll(sessionid: str = Form(...),
 async def igtv_download(sessionid: str = Form(...),
                         media_pk: int = Form(...),
                         folder: Optional[Path] = Form(""),
-                        proxy : str = Form(...),
+                        proxy: str = Form(...),
                         returnFile: Optional[bool] = Form(True),
                         clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -424,7 +446,7 @@ async def igtv_download(sessionid: str = Form(...),
 async def igtv_download_by_urll(sessionid: str = Form(...),
                                 media_pk: int = Form(...),
                                 filename: Optional[str] = Form(""),
-                                proxy : str = Form(...),
+                                proxy: str = Form(...),
                                 returnFile: Optional[bool] = Form(True),
                                 clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -435,11 +457,12 @@ async def igtv_download_by_urll(sessionid: str = Form(...),
         return result
 
 
-@app.post("/download/download_clip_by_pk", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+@app.post("/download/download_clip_by_pk", tags=["Download"], summary='for download reels',
+          responses={404: {"description": "Not found"}})
 async def clip_download(sessionid: str = Form(...),
                         media_pk: int = Form(...),
                         folder: Optional[Path] = Form(""),
-                        proxy : str = Form(...),
+                        proxy: str = Form(...),
                         returnFile: Optional[bool] = Form(True),
                         clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -450,11 +473,12 @@ async def clip_download(sessionid: str = Form(...),
         return result
 
 
-@app.post("/download/download_clip_by_url", tags=["Download"], summary='for download reels', responses={404: {"description": "Not found"}})
+@app.post("/download/download_clip_by_url", tags=["Download"], summary='for download reels',
+          responses={404: {"description": "Not found"}})
 async def clip_download_by_urll(sessionid: str = Form(...),
                                 media_pk: int = Form(...),
                                 filename: Optional[str] = Form(""),
-                                proxy : str = Form(...),
+                                proxy: str = Form(...),
                                 returnFile: Optional[bool] = Form(True),
                                 clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
@@ -468,7 +492,8 @@ async def clip_download_by_urll(sessionid: str = Form(...),
 # DIRECT
 
 @app.post('/direct/send_by_username', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_message_by_username(sessionid: str = Form(...), target_username: str = Form(...),proxy : str = Form(...),
+async def send_direct_message_by_username(sessionid: str = Form(...), target_username: str = Form(...),
+                                          proxy: str = Form(...),
                                           message_body: str = Form(...), clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     taken_username = cl.user_id_from_username(target_username)
@@ -478,7 +503,7 @@ async def send_direct_message_by_username(sessionid: str = Form(...), target_use
 
 
 @app.post('/direct/send_by_id', tags=["direct"], responses={404: {"description": "Not found"}})
-async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: int = Form(...),proxy : str = Form(...),
+async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: int = Form(...), proxy: str = Form(...),
                                     message_body: str = Form(...), clients: ClientStorage = Depends(get_clients), ):
     cl = clients.get(sessionid, proxy)
     result = cl.direct_send(message_body, [target_userid, ])
@@ -501,35 +526,39 @@ async def send_direct_message_by_id(sessionid: str = Form(...), target_userid: i
 # HASHTAG
 
 @app.post('/hashtag/get_top_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27),proxy : str = Form(...),
+async def hashtag_top(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27), proxy: str = Form(...),
                       clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.hashtag_medias_top(name, amount)
 
 
 @app.post('/hashtag/get_recent_hashtags', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27),proxy : str = Form(...),
+async def hashtag_recent(sessionid: str = Form(...), name: str = Form(...), amount: int = Form(27),
+                         proxy: str = Form(...),
                          clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.hashtag_medias_recent(name, amount)
 
 
 @app.post('/hashtag/get_hashtag_info', tags=["hashtag"], responses={404: {"description": "Not found"}})
-async def hashtag_info(sessionid: str = Form(...), name: str = Form(...),proxy : str = Form(...),
+async def hashtag_info(sessionid: str = Form(...), name: str = Form(...), proxy: str = Form(...),
                        clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     result = cl.hashtag_info(
         name=name, )
     return result
 
+
 # Highlight
 
 
 @app.post('/highlight/user_highlights', tags=["highlight"], responses={404: {"description": "Not found"}})
-async def hashtag_top(sessionid: str = Form(...), user_id: str = Form(...), amount: int = Form(5),proxy : str = Form(...),
+async def hashtag_top(sessionid: str = Form(...), user_id: str = Form(...), amount: int = Form(5),
+                      proxy: str = Form(...),
                       clients: ClientStorage = Depends(get_clients)):
     cl = clients.get(sessionid, proxy)
     return cl.user_highlights(user_id, amount)
+
 
 # End Routers
 

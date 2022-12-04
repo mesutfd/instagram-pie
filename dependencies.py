@@ -1,6 +1,6 @@
 from typing import Generator
 
-from storages import ClientStorage, UserBankStorage
+from storages import ClientStorage
 
 
 def get_clients() -> Generator:
@@ -10,10 +10,3 @@ def get_clients() -> Generator:
     finally:
         clients.close()
 
-
-def get_agents():
-    try:
-        agents = UserBankStorage()
-        yield agents
-    finally:
-        agents.close()
